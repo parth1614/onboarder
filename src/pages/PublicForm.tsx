@@ -156,21 +156,21 @@ export default function PublicForm() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-32 h-32 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (error || !form) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-12 text-center max-w-md">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">😔</span>
+      <div className="min-h-screen bg-background flex items-center justify-center p-16">
+        <div className="bg-white rounded-card shadow-card p-48 text-center max-w-md">
+          <div className="w-64 h-64 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-24">
+            <span className="text-6xl">😔</span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Form Not Found</h2>
-          <p className="text-slate-600">
+          <h2 className="text-section text-text-primary mb-12">Form Not Found</h2>
+          <p className="text-text-secondary">
             {error || 'This form does not exist or has not been published yet.'}
           </p>
         </div>
@@ -180,14 +180,14 @@ export default function PublicForm() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-12 text-center max-w-md animate-[fadeIn_0.5s_ease-out]">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-600" />
+      <div className="min-h-screen bg-background flex items-center justify-center p-16">
+        <div className="bg-white rounded-card shadow-card p-48 text-center max-w-md animate-[fadeIn_0.5s_ease-out]">
+          <div className="w-80 h-80 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-24">
+            <Check className="w-40 h-40 text-green-600" />
           </div>
-          <h2 className="text-3xl font-bold text-slate-900 mb-3">Thank You!</h2>
-          <p className="text-lg text-slate-600">
-            Your response has been submitted successfully. We'll get back to you soon.
+          <h2 className="text-section text-text-primary mb-12">Thank You!</h2>
+          <p className="text-subheading text-text-secondary">
+            Your response has been submitted successfully.
           </p>
         </div>
       </div>
@@ -195,39 +195,39 @@ export default function PublicForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-3xl">
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="w-6 h-6 text-blue-600" />
-            <span className="text-sm font-medium text-slate-600">
+    <div className="min-h-screen bg-background flex items-center justify-center p-16">
+      <div className="w-full max-w-2xl">
+        <div className="mb-32">
+          <div className="flex items-center gap-8 mb-16">
+            <Sparkles className="w-24 h-24 text-primary" />
+            <span className="text-sm font-medium text-text-secondary">
               Question {currentStep + 1} of {questions.length}
             </span>
           </div>
-          <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+          <div className="w-full h-8 bg-border rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-600 transition-all duration-500 ease-out"
+              className="h-full bg-primary transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
         {currentStep === 0 && (
-          <div className="mb-8 animate-[slideIn_0.3s_ease-out]">
-            <h1 className="text-4xl font-bold text-slate-900 mb-3">{form.title}</h1>
+          <div className="mb-32 animate-[slideIn_0.3s_ease-out]">
+            <h1 className="text-hero text-text-primary mb-12">{form.title}</h1>
             {form.description && (
-              <p className="text-lg text-slate-600">{form.description}</p>
+              <p className="text-subheading text-text-secondary">{form.description}</p>
             )}
           </div>
         )}
 
-        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 animate-[slideIn_0.3s_ease-out]">
+        <div className="bg-white rounded-card shadow-card p-32 md:p-48 animate-[slideIn_0.3s_ease-out]">
           {currentQuestion && (
-            <div className="mb-8">
-              <label className="block text-2xl font-semibold text-slate-900 mb-6">
+            <div className="mb-32">
+              <label className="block text-section text-text-primary mb-24">
                 {currentQuestion.question_text}
                 {currentQuestion.is_required && (
-                  <span className="text-red-500 ml-1">*</span>
+                  <span className="text-red-500 ml-4">*</span>
                 )}
               </label>
 
@@ -239,13 +239,13 @@ export default function PublicForm() {
                     setAnswers(newAnswers);
                     saveProgress(currentStep, newAnswers);
                   }}
-                  className="w-full px-6 py-4 text-lg rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-0 outline-none transition resize-none"
+                  className="w-full px-24 py-16 text-lg rounded-input border-2 border-border focus:border-primary focus:ring-0 outline-none transition resize-none"
                   rows={5}
                   placeholder="Type your answer here..."
                   autoFocus
                 />
               ) : currentQuestion.question_type === 'select' ? (
-                <div className="space-y-3">
+                <div className="space-y-12">
                   {currentQuestion.options &&
                     JSON.parse(currentQuestion.options as string).map((option: string) => (
                       <button
@@ -255,10 +255,10 @@ export default function PublicForm() {
                           setAnswers(newAnswers);
                           saveProgress(currentStep, newAnswers);
                         }}
-                        className={`w-full px-6 py-4 text-lg text-left rounded-xl border-2 transition ${
+                        className={`w-full px-24 py-16 text-lg text-left rounded-input border-2 transition ${
                           answers[currentQuestion.id] === option
-                            ? 'border-blue-500 bg-blue-50 text-blue-900'
-                            : 'border-slate-200 hover:border-blue-300'
+                            ? 'border-primary bg-primary-soft text-text-primary'
+                            : 'border-border hover:border-primary'
                         }`}
                       >
                         {option}
@@ -282,7 +282,7 @@ export default function PublicForm() {
                     setAnswers(newAnswers);
                     saveProgress(currentStep, newAnswers);
                   }}
-                  className="w-full px-6 py-4 text-lg rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-0 outline-none transition"
+                  className="w-full px-24 py-16 text-lg rounded-input border-2 border-border focus:border-primary focus:ring-0 outline-none transition"
                   placeholder="Type your answer here..."
                   autoFocus
                 />
@@ -294,37 +294,37 @@ export default function PublicForm() {
             <button
               onClick={handlePrevious}
               disabled={currentStep === 0}
-              className="flex items-center gap-2 px-6 py-3 text-slate-600 hover:text-slate-900 font-medium disabled:opacity-30 disabled:cursor-not-allowed transition"
+              className="flex items-center gap-8 px-20 py-12 text-text-secondary hover:text-text-primary font-medium disabled:opacity-30 disabled:cursor-not-allowed transition"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-20 h-20" />
               Previous
             </button>
 
             <button
               onClick={handleNext}
               disabled={submitting}
-              className="flex items-center gap-2 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition disabled:opacity-50"
+              className="flex items-center gap-8 px-32 py-14 bg-primary hover:bg-primary-hover text-white font-semibold rounded-button transition disabled:opacity-50"
             >
               {submitting ? (
                 'Submitting...'
               ) : isLastQuestion ? (
                 <>
-                  <Check className="w-5 h-5" />
+                  <Check className="w-20 h-20" />
                   Submit
                 </>
               ) : (
                 <>
                   Next
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-20 h-20" />
                 </>
               )}
             </button>
           </div>
         </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-slate-500">
-            Press <kbd className="px-2 py-1 bg-slate-200 rounded text-xs">Enter</kbd> to continue
+        <div className="mt-24 text-center">
+          <p className="text-sm text-text-muted">
+            Press <kbd className="px-8 py-4 bg-border rounded text-xs">Enter</kbd> to continue
           </p>
         </div>
       </div>
