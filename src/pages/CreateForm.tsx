@@ -5,9 +5,9 @@ import { supabase } from '../lib/supabase';
 import { Zap, ArrowLeft, Loader2, Globe, CheckCircle2, MessageSquare, Sparkles, Wand2 } from 'lucide-react';
 
 const steps = [
-  { label: 'Deep Scrape & Analysis', icon: Globe },
-  { label: 'LLM Reasoning & Generation', icon: MessageSquare },
-  { label: 'Securing Workspace Metadata', icon: CheckCircle2 },
+  { label: 'Website Analysis', icon: Globe },
+  { label: 'AI Question Generation', icon: MessageSquare },
+  { label: 'Saving Your Form', icon: CheckCircle2 },
 ];
 
 export default function CreateForm() {
@@ -103,7 +103,7 @@ export default function CreateForm() {
       questions = parsed.questions;
 
       setLoadingStep(2);
-      const { data: form, error: formError } = await supabase.from('forms').insert({
+      const { data: form, error: formError } = await (supabase.from('forms').insert({
         owner_id: user.id,
         form_type: formType,
         title: formTitle,
@@ -111,21 +111,21 @@ export default function CreateForm() {
         website_url: websiteUrl || null,
         business_context: businessContext || null,
         is_published: false,
-      }).select().single();
+      } as any) as any).select().single();
       if (formError) throw formError;
 
-      const { error: qErr } = await supabase.from('questions').insert(
+      const { error: qErr } = await (supabase.from('questions').insert(
         questions.map((q: any, i: number) => ({
-          form_id: form.id,
+          form_id: (form as any).id,
           question_text: q.question_text,
           question_type: q.question_type,
           is_required: q.is_required,
           order_index: i,
           options: q.options ? JSON.stringify(q.options) : null,
-        }))
-      );
+        })) as any
+      ) as any);
       if (qErr) throw qErr;
-      navigate(`/form/${form.id}/edit`);
+      navigate(`/form/${(form as any).id}/edit`);
     } catch (err: any) {
       setError(err.message || 'Failed to generate form. Please try again.');
     } finally {
@@ -139,33 +139,33 @@ export default function CreateForm() {
       <div className="fixed inset-0 bg-grid pointer-events-none opacity-40 z-0" />
       <div className="fixed inset-0 bg-radial-glow pointer-events-none z-0" />
 
-      {/* ── Navigation ── */}
-      <nav className="relative z-50 border-b border-line bg-canvas/60 backdrop-blur-xl sticky top-0">
-        <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+      {/* ── Navigation (80px) ── */}
+      <nav className="relative z-50 border-b border-line bg-canvas/80 backdrop-blur-3xl sticky top-0" style={{ height: '80px', minHeight: '80px' }}>
+        <div className="max-w-3xl mx-auto px-6 h-full flex items-center justify-between">
           <button onClick={() => navigate('/landing')} className="btn-ghost flex items-center gap-2 -ml-2 text-sm font-semibold hover:text-ink-primary">
             <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-            Back to Home
+            <span className="hidden sm:inline">Back to Home</span>
           </button>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/10">
-              <Zap className="w-4 h-4 text-black" fill="black" />
+            <div className="w-10 h-10 rounded-2xl bg-amber-500 flex items-center justify-center shadow-xl shadow-amber-500/10">
+              <Zap className="w-5 h-5 text-black" fill="black" />
             </div>
-            <span className="text-lg font-extrabold tracking-tighter">bishopAI</span>
+            <span className="text-xl font-extrabold tracking-tighter uppercase italic">bishopAI</span>
           </div>
         </div>
       </nav>
 
       <div className="relative z-10 max-w-2xl mx-auto px-6 py-20 pb-12 animate-slide-up">
         {/* Header Section */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm font-extrabold text-amber-500 mb-8 shadow-xl shadow-amber-500/5 backdrop-blur-sm">
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[10px] sm:text-xs font-extrabold text-amber-500 mb-6 sm:mb-8 shadow-xl shadow-amber-500/5 backdrop-blur-sm">
             <Sparkles className="w-4 h-4" />
-            Project Creation Portal
+            Form Generation Hub
           </div>
-          <h1 className="text-4xl font-extrabold text-ink-primary tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-ink-primary tracking-tight mb-4 px-4">
             {formType === 'agency' ? 'Generate from Website' : 'Context-Based Portal'}
           </h1>
-          <p className="text-lg text-ink-secondary font-medium leading-relaxed max-w-lg mx-auto">
+          <p className="text-base sm:text-lg text-ink-secondary font-medium leading-relaxed max-w-lg mx-auto px-4 opacity-80">
             {formType === 'agency'
               ? 'Our AI engine will deeply analyze your website architecture to craft the perfect intake journey.'
               : "Tell us about your target clients and we'll engineer a high-performing onboarding flow."}
@@ -188,7 +188,7 @@ export default function CreateForm() {
             {formType === 'agency' ? (
               <div className="space-y-3">
                 <label htmlFor="website" className="block text-xs font-bold tracking-[0.15em] uppercase text-ink-tertiary">
-                  Agency Base URL
+                  Business Website URL
                 </label>
                 <div className="relative group/input">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-canvas-elevated border border-line flex items-center justify-center transition-colors group-hover/input:border-amber-500/30">
@@ -205,13 +205,13 @@ export default function CreateForm() {
                   />
                 </div>
                 <p className="text-xs text-ink-muted leading-relaxed mt-2 opacity-80">
-                  We use GPT-4o to analyze your company's core services, ICP, and value propositions before generating questions.
+                  Our AI will analyze your website services, audience, and value propositions to generate the perfect onboarding journey.
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
                 <label htmlFor="context" className="block text-xs font-bold tracking-[0.15em] uppercase text-ink-tertiary">
-                  Business Intelligence Info
+                  Business Description
                 </label>
                 <textarea
                   id="context"
@@ -223,7 +223,7 @@ export default function CreateForm() {
                   className="input-base px-6 py-5 text-lg font-medium leading-relaxed resize-none"
                 />
                 <p className="text-xs text-ink-muted leading-relaxed mt-2 opacity-80">
-                  More detailed business intelligence leads to 40% higher conversion rates in generated forms.
+                  Detailed descriptions help our AI engineer forms that result in 40% higher client conversion rates.
                 </p>
               </div>
             )}
@@ -231,7 +231,7 @@ export default function CreateForm() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-5 text-xl mt-6 shadow-xl shadow-amber-500/10 group/btn"
+              className="btn-primary w-full py-4 sm:py-5 text-lg sm:text-xl mt-6 shadow-xl shadow-amber-500/10 group/btn"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-4">
@@ -241,7 +241,7 @@ export default function CreateForm() {
               ) : (
                 <span className="flex items-center justify-center gap-3">
                   <Wand2 className="w-6 h-6 transition-transform group-hover/btn:rotate-12" />
-                  Generate AI Foundation
+                  Generate My Form
                 </span>
               )}
             </button>
@@ -253,8 +253,8 @@ export default function CreateForm() {
               {steps.map((step, i) => (
                 <div key={step.label} className="flex items-start gap-6 group">
                   <div className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center shrink-0 transition-all duration-500 ${i < loadingStep ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' :
-                      i === loadingStep ? 'border-amber-500 bg-amber-500/10 text-amber-500 shadow-xl shadow-amber-500/20' :
-                        'border-line bg-canvas-elevated text-ink-tertiary'
+                    i === loadingStep ? 'border-amber-500 bg-amber-500/10 text-amber-500 shadow-xl shadow-amber-500/20' :
+                      'border-line bg-canvas-elevated text-ink-tertiary'
                     }`}>
                     {i < loadingStep ? (
                       <CheckCircle2 className="w-5 h-5 animate-slide-up" />
@@ -269,7 +269,7 @@ export default function CreateForm() {
                       {step.label}
                     </span>
                     <span className={`text-xs font-medium opacity-60 transition-opacity ${i === loadingStep ? 'opacity-100' : 'opacity-40'}`}>
-                      {i < loadingStep ? 'Completed and verified.' : i === loadingStep ? 'Currently processing data stream…' : 'Awaiting upstream handshake.'}
+                      {i < loadingStep ? 'Analysis complete.' : i === loadingStep ? 'Processing data...' : 'Waiting to start...'}
                     </span>
                   </div>
                 </div>
@@ -281,12 +281,12 @@ export default function CreateForm() {
         {/* Informational Guidance */}
         {!loading && (
           <div className="card-premium p-8 animate-slide-up bg-canvas/30 backdrop-blur-md border-line/40">
-            <h4 className="text-xs font-extrabold uppercase tracking-widest text-ink-muted mb-6">AI Engineering Protocol</h4>
+            <h4 className="text-xs font-extrabold uppercase tracking-widest text-ink-muted mb-6">How it works</h4>
             <div className="grid gap-6">
               {[
-                { title: `Semantic Scrape`, desc: `Our engine identifies core semantic tokens from your ${formType === 'agency' ? 'landing page' : 'context description'}.` },
-                { title: `Conversion Modeling`, desc: `Questions are engineered to maximize client response rates using psychological conversion models.` },
-                { title: `Workspace Handshake`, desc: `Once generated, the form is immediately published to your workspace for review.` },
+                { title: `Website Reading`, desc: `Our engine identifies core services and audience details from your ${formType === 'agency' ? 'landing page' : 'description'}.` },
+                { title: `Intelligent Questions`, desc: `Questions are designed to maximize client response rates using proven conversion models.` },
+                { title: `Instant Dashboard`, desc: `Once generated, your form is ready in your dashboard to review and share.` },
               ].map((s, i) => (
                 <div key={i} className="flex items-start gap-5">
                   <div className="w-7 h-7 rounded-lg bg-canvas-elevated border border-line flex items-center justify-center text-[10px] font-extrabold text-ink-tertiary shrink-0 mt-0.5">

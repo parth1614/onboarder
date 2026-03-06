@@ -63,7 +63,7 @@ export default function Responses() {
     const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-    a.download = `${form?.title || 'form'}-intelligence-report.csv`;
+    a.download = `${form?.title || 'form'}-submissions.csv`;
     a.click();
   };
 
@@ -72,7 +72,7 @@ export default function Responses() {
   });
 
   const getInitials = (email: string | null) =>
-    email ? email.split('@')[0].slice(0, 2).toUpperCase() : 'IQ';
+    email ? email.split('@')[0].slice(0, 2).toUpperCase() : 'RT';
 
   const filteredResponses = responses.filter(r =>
     (r.respondent_email || '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -83,7 +83,7 @@ export default function Responses() {
       <div className="min-h-screen bg-canvas flex flex-col items-center justify-center p-8 gap-8 animate-fade-in relative overflow-hidden">
         <div className="fixed inset-0 bg-grid opacity-40 pointer-events-none" />
         <div className="w-10 h-10 border-2 border-amber-500/20 border-t-amber-500 rounded-full animate-spin" />
-        <p className="text-xs font-bold uppercase tracking-widest text-ink-tertiary">Accessing Intelligence Datashards…</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-ink-tertiary">Loading Form Submissions…</p>
       </div>
     );
   }
@@ -93,29 +93,30 @@ export default function Responses() {
     <div className="min-h-screen bg-canvas text-ink-primary flex flex-col relative overflow-hidden">
       <div className="fixed inset-0 bg-grid opacity-20 pointer-events-none z-0" />
 
-      {/* ── Navigation ── */}
-      <nav className="relative z-50 border-b border-line bg-canvas/60 backdrop-blur-xl sticky top-0">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      {/* ── Navigation (80px) ── */}
+      <nav className="relative z-50 border-b border-line bg-canvas/80 backdrop-blur-3xl sticky top-0" style={{ height: '80px', minHeight: '80px' }}>
+        <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center gap-6">
             <button onClick={() => navigate('/dashboard')} className="btn-ghost flex items-center gap-2 -ml-2 text-sm font-semibold hover:text-ink-primary">
               <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-              Workspace
+              <span className="hidden sm:inline">Dashboard</span>
             </button>
-            <div className="hidden sm:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4">
               <div className="w-px h-6 bg-line" />
               <div className="flex items-center gap-3">
-                <span className="text-sm font-bold tracking-tight text-ink-secondary truncate max-w-[300px]">{form.title}</span>
-                <span className="badge-amber px-2 py-0.5 scale-75 uppercase text-[10px] font-black">Datashards</span>
+                <span className="text-sm font-bold tracking-tight text-ink-secondary truncate max-w-[200px]">{form.title}</span>
+                <span className="badge-amber px-2 py-0.5 scale-75 uppercase text-[10px] font-black">Submissions</span>
               </div>
             </div>
           </div>
           <button
             onClick={exportToCSV}
             disabled={!responses.length}
-            className="btn-primary px-5 py-2 gap-2 text-xs font-extrabold uppercase tracking-widest disabled:opacity-30 disabled:cursor-not-allowed shadow-xl shadow-amber-500/10"
+            className="btn-primary px-5 py-2.5 gap-2 text-[10px] font-black uppercase tracking-widest disabled:opacity-30 disabled:cursor-not-allowed shadow-xl shadow-amber-500/10"
           >
             <Download className="w-4 h-4" />
-            Export Intel
+            <span className="hidden xs:inline">Export CSV</span>
+            <span className="xs:hidden">Export</span>
           </button>
         </div>
       </nav>
@@ -127,9 +128,9 @@ export default function Responses() {
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
                 <Activity className="w-5 h-5 text-amber-500" />
               </div>
-              <h1 className="text-4xl font-extrabold text-ink-primary tracking-tighter">Portal Intelligence Feed</h1>
+              <h1 className="text-4xl font-extrabold text-ink-primary tracking-tighter">Form Submissions</h1>
             </div>
-            <p className="text-base text-ink-secondary font-medium">Monitoring <span className="text-ink-primary font-bold">{responses.length} client submissions</span> for this identity.</p>
+            <p className="text-base text-ink-secondary font-medium">Tracking <span className="text-ink-primary font-bold">{responses.length} client responses</span> for this form.</p>
           </div>
 
           <div className="relative w-full md:w-80 group">
@@ -152,16 +153,16 @@ export default function Responses() {
             <div className="w-20 h-20 rounded-3xl bg-canvas-elevated border border-line flex items-center justify-center mx-auto mb-10 shadow-3xl">
               <Mail className="w-10 h-10 text-ink-tertiary" />
             </div>
-            <h3 className="text-2xl font-bold text-ink-primary mb-3 tracking-tight">No feed activity detected</h3>
+            <h3 className="text-2xl font-bold text-ink-primary mb-3 tracking-tight">No submissions yet</h3>
             <p className="text-base text-ink-secondary mb-12 max-w-sm mx-auto">
-              The public intelligence tunnel is live, but no datashards have been committed yet.
+              Your form is live, but no clients have submitted their information yet.
             </p>
             {form.is_published && (
               <button
                 onClick={() => navigator.clipboard.writeText(`${window.location.origin}/form/${formId}`)}
                 className="btn-secondary px-8 py-3.5 gap-3 text-base shadow-2xl"
               >
-                <Zap className="w-5 h-5 text-amber-500" fill="currentColor" /> Copy Tunnel Access Link
+                <Zap className="w-5 h-5 text-amber-500" fill="currentColor" /> Copy Form Link
               </button>
             )}
           </div>
@@ -171,7 +172,7 @@ export default function Responses() {
             <div className="lg:col-span-12 flex flex-col gap-3 overflow-y-auto no-scrollbar pb-10">
               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-ink-muted mb-4 flex items-center gap-2">
                 <DatabaseIcon className="w-3 h-3" />
-                Commit History
+                Submission History
               </h4>
               <div className="grid lg:grid-cols-2 gap-8">
                 <div className="flex flex-col gap-3 overflow-y-auto no-scrollbar pb-10">
@@ -194,7 +195,7 @@ export default function Responses() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xl font-extrabold text-ink-primary truncate tracking-tight mb-1">
-                            {response.respondent_email || `Shard ID #${response.id.slice(0, 8)}`}
+                            {response.respondent_email || `Submission #${response.id.slice(0, 8)}`}
                           </p>
                           <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-ink-tertiary">
                             <div className="flex items-center gap-1.5">
@@ -202,7 +203,7 @@ export default function Responses() {
                               <span>{formatDate(response.submitted_at)}</span>
                             </div>
                             <div className="w-1 h-1 rounded-full bg-line" />
-                            <span className={selectedResponse?.id === response.id ? 'text-amber-500' : 'text-ink-muted'}>Commit Verified</span>
+                            <span className={selectedResponse?.id === response.id ? 'text-amber-500' : 'text-ink-muted'}>Verified</span>
                           </div>
                         </div>
                         <ChevronRight className={`w-5 h-5 shrink-0 transition-transform ${selectedResponse?.id === response.id ? 'text-amber-500 translate-x-1' : 'text-ink-muted group-hover:translate-x-1'
@@ -221,14 +222,14 @@ export default function Responses() {
                             {getInitials(selectedResponse.respondent_email)}
                           </div>
                           <div className="flex-1">
-                            <div className="badge-premium badge-amber text-[10px] py-0.5 scale-75 uppercase tracking-widest mb-3">Validated Intelligence</div>
+                            <div className="badge-premium badge-amber text-[10px] py-0.5 scale-75 uppercase tracking-widest mb-3">Verified Response</div>
                             <h3 className="text-3xl font-extrabold text-ink-primary tracking-tighter mb-2">
                               {selectedResponse.respondent_email || 'Anonymous Respondent'}
                             </h3>
                             <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-ink-tertiary">
-                              <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Commit: {formatDate(selectedResponse.submitted_at)}</span>
+                              <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Submitted: {formatDate(selectedResponse.submitted_at)}</span>
                               <span className="opacity-30">|</span>
-                              <span className="flex items-center gap-1.5 text-emerald-500"><Zap className="w-3.5 h-3.5" fill="currentColor" /> Priority Sync Active</span>
+                              <span className="flex items-center gap-1.5 text-emerald-500"><Zap className="w-3.5 h-3.5" fill="currentColor" /> Active Response</span>
                             </div>
                           </div>
                         </div>
@@ -247,7 +248,7 @@ export default function Responses() {
                               </div>
                               <div className="bg-canvas-elevated/30 rounded-2xl px-8 py-6 border border-line/40 group hover:border-amber-500/20 transition-all">
                                 <p className="text-lg font-medium text-ink-primary leading-relaxed whitespace-pre-wrap">
-                                  {answer?.answer_text || <span className="text-ink-muted italic opacity-30">Intelligence void: no data committed for this probe protocol.</span>}
+                                  {answer?.answer_text || <span className="text-ink-muted italic opacity-30">No data provided for this question.</span>}
                                 </p>
                               </div>
                             </div>
@@ -264,7 +265,7 @@ export default function Responses() {
                           className="btn-ghost px-4 py-2 scale-90 gap-2 text-[10px] font-black uppercase tracking-widest"
                           onClick={() => setSelectedResponse(null)}
                         >
-                          Close Portal Shard
+                          Close Response
                         </button>
                       </div>
                     </div>
@@ -273,9 +274,9 @@ export default function Responses() {
                       <div className="w-24 h-24 rounded-[2.5rem] bg-canvas-elevated border-2 border-line/40 flex items-center justify-center mb-10 shadow-2xl">
                         <Activity className="w-10 h-10 text-ink-tertiary opacity-30" />
                       </div>
-                      <h4 className="text-xl font-bold text-ink-primary mb-3">Awaiting Shard Selection</h4>
+                      <h4 className="text-xl font-bold text-ink-primary mb-3">Select a Response</h4>
                       <p className="text-base text-ink-tertiary max-w-xs leading-relaxed">
-                        Access the portal commit history on the left to inspect detailed intelligence datashards.
+                        Choose a submission from the list on the left to view detailed client data.
                       </p>
                     </div>
                   )}

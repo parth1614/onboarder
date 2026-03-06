@@ -23,7 +23,7 @@ const features = [
 const steps = [
   { icon: Globe, title: "Website Analysis", desc: "Our AI deeply crawls your site to understand your services, target audience, and business model." },
   { icon: Sparkles, title: "AI Generation", desc: "Using advanced LLMs, we generate 10-15 highly specific onboarding questions tailored to your needs." },
-  { icon: Shield, title: "Ready for Delivery", desc: "A polished, high-converting onboarding form is ready for your clients in seconds." }
+  { icon: Shield, title: "Ready for Delivery", desc: "A polished, structured onboarding form is ready for your clients in seconds." }
 ];
 
 export default function Landing() {
@@ -36,9 +36,9 @@ export default function Landing() {
       <div className="fixed inset-0 bg-grid pointer-events-none opacity-40 z-0" />
       <div className="fixed inset-0 bg-radial-glow pointer-events-none z-0" />
 
-      {/* ── Navigation ── */}
-      <nav className="relative z-50 border-b border-line bg-canvas/60 backdrop-blur-xl sticky top-0">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      {/* ── Navigation (80px) ── */}
+      <nav className="relative z-50 border-b border-line bg-canvas/80 backdrop-blur-3xl sticky top-0" style={{ height: '80px', minHeight: '80px' }}>
+        <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center gap-3 group cursor-pointer" onClick={() => navigate('/')}>
             <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center transition-transform group-hover:scale-110">
               <Zap className="w-5 h-5 text-black" fill="black" />
@@ -48,7 +48,7 @@ export default function Landing() {
           <div className="flex items-center gap-6">
             <button
               onClick={() => navigate('/dashboard')}
-              className="btn-secondary px-6 py-2"
+              className="btn-secondary px-8 py-3"
             >
               My Forms
             </button>
@@ -65,26 +65,26 @@ export default function Landing() {
               NEW: GPT-4o Enhanced Analysis
             </div>
 
-            <h1 className="text-6xl md:text-7xl font-extrabold mb-8 leading-[1.1] tracking-tight text-ink-primary">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold mb-8 leading-[1.1] tracking-tight text-ink-primary px-4">
               Onboarding forms that<br />
               <span className="text-gradient-amber">write themselves</span>
             </h1>
 
-            <p className="text-xl text-ink-secondary max-w-2xl mx-auto mb-12 leading-relaxed font-light">
+            <p className="text-lg sm:text-xl text-ink-secondary max-w-2xl mx-auto mb-12 leading-relaxed font-light px-6 opacity-80">
               Don't manually craft onboarding questions. Let our AI analyze your website and build high-converting forms in seconds.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-5 px-6 w-full sm:w-auto">
               <button
                 onClick={() => navigate('/create?type=agency')}
-                className="btn-primary px-8 py-4 text-base shadow-xl group"
+                className="btn-primary px-10 py-5 text-lg shadow-xl group w-full sm:w-auto"
               >
                 Create a form
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
               </button>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="btn-secondary px-8 py-4 text-base"
+                className="btn-secondary px-10 py-5 text-lg w-full sm:w-auto"
               >
                 View dashboard
               </button>
@@ -114,7 +114,7 @@ export default function Landing() {
                     </div>
                   </div>
                   <p className="text-base text-ink-secondary leading-relaxed mb-6">
-                    Paste your website URL. AI analyzes your services to generate a tailored form for new clients.
+                    Paste your website URL. AI analyzes your services to generate a tailored onboarding journey.
                   </p>
                   <div className="flex items-center gap-3">
                     <span className="badge-amber">AI Website Scan</span>
@@ -140,7 +140,7 @@ export default function Landing() {
                     </div>
                   </div>
                   <p className="text-base text-ink-secondary leading-relaxed mb-6">
-                    Describe your business once. Get a reusable intake link for all your new customers.
+                    Describe your business profile once and get a reusable intake link for all your clients.
                   </p>
                   <div className="flex items-center gap-3">
                     <span className="badge-amber">Reusable Link</span>
@@ -157,7 +157,7 @@ export default function Landing() {
           <div className="absolute inset-0 bg-grid opacity-20" />
           <div className="max-w-5xl mx-auto px-6 relative z-10">
             <div className="mb-16 text-center">
-              <h2 className="text-3xl font-bold mb-4">The path to perfect onboarding</h2>
+              <h2 className="text-3xl font-bold mb-4">The path to automated client intake</h2>
               <p className="text-ink-secondary max-w-xl mx-auto">Skip the manual work. We automated the entire process so you can focus on building relationships.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-10">

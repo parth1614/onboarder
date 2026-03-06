@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from '../hooks/useNavigate';
 import { supabase } from '../lib/supabase';
-import { ArrowLeft, Save, Eye, Plus, Trash2, Check, ExternalLink, Zap, ChevronUp, ChevronDown, Wand2, Settings, Sparkles, LayoutDashboard } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Plus, Trash2, Check, ExternalLink, Zap, ChevronUp, ChevronDown, Wand2, Settings, Sparkles, LayoutDashboard, Database as DatabaseIcon } from 'lucide-react';
 import type { Database } from '../lib/database.types';
 
 type Form = Database['public']['Tables']['forms']['Row'];
@@ -57,7 +57,7 @@ export default function FormEditor() {
     setQuestions([...questions, {
       id: `temp-${Date.now()}`,
       form_id: formId,
-      question_text: 'New Intelligence Probe',
+      question_text: 'New Question',
       question_type: 'text',
       is_required: true,
       order_index: questions.length,
@@ -83,15 +83,15 @@ export default function FormEditor() {
     setSaveMessage('');
     try {
       await supabase.from('questions').delete().eq('form_id', formId);
-      await supabase.from('questions').insert(questions.map((q, i) => ({
+      await (supabase.from('questions').insert(questions.map((q, i) => ({
         form_id: formId,
         question_text: q.question_text,
         question_type: q.question_type,
         is_required: q.is_required,
         order_index: i,
         options: q.options,
-      })));
-      setSaveMessage('Saved Portal Metadata');
+      }))) as any);
+      setSaveMessage('Form Saved Successfully');
       setTimeout(() => setSaveMessage(''), 3000);
       await loadForm();
     } catch (error) {
@@ -101,7 +101,7 @@ export default function FormEditor() {
 
   const publishForm = async () => {
     if (!form) return;
-    const { error } = await supabase.from('forms').update({ is_published: true }).eq('id', formId);
+    const { error } = await (supabase.from('forms').update({ is_published: true }).eq('id', formId) as any);
     if (!error) setForm({ ...form, is_published: true });
   };
 
@@ -115,7 +115,7 @@ export default function FormEditor() {
     return (
       <div className="min-h-screen bg-canvas flex flex-col items-center justify-center gap-6">
         <div className="w-10 h-10 border-2 border-amber-500/20 border-t-amber-500 rounded-full animate-spin" />
-        <p className="text-sm font-bold uppercase tracking-widest text-ink-tertiary">Decrypting Portal Metadata…</p>
+        <p className="text-sm font-bold uppercase tracking-widest text-ink-tertiary">Loading Form Editor…</p>
       </div>
     );
   }
@@ -127,43 +127,42 @@ export default function FormEditor() {
       <div className="fixed inset-0 bg-grid pointer-events-none opacity-20 z-0" />
       <div className="fixed inset-0 bg-radial-glow pointer-events-none z-0 opacity-40" />
 
-      {/* ── Navigation ── */}
-      <nav className="relative z-50 border-b border-line bg-canvas/60 backdrop-blur-xl sticky top-0">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      {/* ── Navigation (80px) ── */}
+      <nav className="relative z-50 border-b border-line bg-canvas/80 backdrop-blur-3xl sticky top-0" style={{ height: '80px', minHeight: '80px' }}>
+        <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center gap-6">
             <button onClick={() => navigate('/dashboard')} className="btn-ghost flex items-center gap-2 -ml-2 text-sm font-semibold hover:text-ink-primary">
               <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
-              Portal Dashboard
+              <span className="hidden sm:inline">Back to Dashboard</span>
             </button>
-            <div className="hidden sm:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4">
               <div className="w-px h-6 bg-line" />
               <div className="flex items-center gap-3">
-                <span className="text-sm font-bold tracking-tight text-ink-secondary truncate max-w-[300px]">{form.title}</span>
-                {form.is_published && <span className="badge-success scale-90">Live Tunnel</span>}
+                <span className="text-sm font-bold tracking-tight text-ink-secondary truncate max-w-[200px]">{form.title}</span>
+                {form.is_published && <span className="badge-success scale-75">Live</span>}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             {saveMessage && (
-              <span className={`text-xs flex items-center gap-2 font-bold uppercase tracking-widest ${saveMessage.includes('Saved') ? 'text-emerald-500' : 'text-danger'
-                } animate-fade-in`}>
+              <span className={`hidden sm:flex text-[10px] items-center gap-2 font-black uppercase tracking-widest ${saveMessage.includes('Saved') ? 'text-emerald-500' : 'text-danger'} animate-fade-in`}>
                 <Check className="w-4 h-4" /> {saveMessage}
               </span>
             )}
-            <button onClick={saveForm} disabled={saving} className="btn-secondary px-5 py-2 group">
+            <button onClick={saveForm} disabled={saving} className="btn-secondary px-4 sm:px-5 py-2 group text-xs sm:text-sm">
               <Save className="w-4 h-4 text-ink-tertiary group-hover:text-amber-500" />
-              {saving ? 'Syncing…' : 'Sync Changes'}
+              <span className="hidden xs:inline">{saving ? 'Syncing…' : 'Sync'}</span>
             </button>
             {form.is_published ? (
-              <button onClick={copyFormLink} className="btn-primary px-5 py-2 shadow-lg shadow-amber-500/20">
+              <button onClick={copyFormLink} className="btn-primary px-4 sm:px-5 py-2 shadow-lg shadow-amber-500/20 text-xs sm:text-sm">
                 <ExternalLink className="w-4 h-4" />
-                {copied ? 'Link Copied!' : 'Public Tunnel'}
+                <span className="hidden xs:inline">{copied ? 'Copied!' : 'Share Link'}</span>
               </button>
             ) : (
-              <button onClick={publishForm} className="btn-primary px-5 py-2 shadow-lg shadow-amber-500/20">
+              <button onClick={publishForm} className="btn-primary px-4 sm:px-5 py-2 shadow-lg shadow-amber-500/20 text-xs sm:text-sm">
                 <Eye className="w-4 h-4" />
-                Publish Live
+                <span className="hidden xs:inline">Publish</span>
               </button>
             )}
           </div>
@@ -178,10 +177,10 @@ export default function FormEditor() {
               <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-amber-500" />
               </div>
-              <h2 className="text-xs font-bold uppercase tracking-widest text-ink-tertiary">Portal IQ Identity</h2>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-ink-tertiary">Form Branding</h2>
             </div>
             <div className={`badge-premium px-2 py-0.5 scale-75 ${form.is_published ? 'badge-success' : 'badge-neutral'}`}>
-              {form.is_published ? 'Active Production' : 'Draft Intel'}
+              {form.is_published ? 'Live Form' : 'Draft'}
             </div>
           </div>
 
@@ -190,13 +189,13 @@ export default function FormEditor() {
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
             className="text-5xl font-extrabold text-ink-primary bg-transparent border-none outline-none w-full mb-6 focus:ring-0 tracking-tighter placeholder:text-ink-muted/30"
-            placeholder="Intelligence Portal Identity…"
+            placeholder="Enter Form Title…"
           />
           <textarea
             value={form.description || ''}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             className="text-xl text-ink-secondary bg-transparent border-none outline-none w-full resize-none focus:ring-0 leading-relaxed font-light placeholder:text-ink-muted/30"
-            placeholder="Provide architectural context for this onboarding tunnel…"
+            placeholder="Add a friendly description for your clients…"
             rows={2}
           />
         </div>
@@ -204,13 +203,13 @@ export default function FormEditor() {
         {/* Intelligence Probes Section */}
         <div className="flex items-center justify-between mb-8 px-2">
           <div className="flex items-center gap-4">
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-ink-tertiary">Portal Probes</h3>
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-ink-tertiary">Form Questions</h3>
             <div className="w-px h-4 bg-line" />
-            <span className="text-xs font-bold text-ink-muted opacity-80">{questions.length} Active Probes</span>
+            <span className="text-xs font-bold text-ink-muted opacity-80">{questions.length} Questions</span>
           </div>
           <button onClick={addQuestion} className="btn-secondary px-4 py-2 scale-90 gap-2">
             <Plus className="w-4 h-4" />
-            Append Probe
+            Add Question
           </button>
         </div>
 
@@ -219,7 +218,7 @@ export default function FormEditor() {
           {questions.map((question, index) => (
             <div key={question.id} className="card-premium p-8 group animate-slide-up relative overflow-hidden" style={{ animationDelay: `${index * 0.05}s` }}>
               <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-                <Database className="w-16 h-16" />
+                <DatabaseIcon className="w-16 h-16" />
               </div>
 
               <div className="flex items-start gap-8 relative z-10">
@@ -247,19 +246,19 @@ export default function FormEditor() {
                 {/* Probe Configuration */}
                 <div className="flex-1 space-y-6">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Probe Query</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Question Text</label>
                     <input
                       type="text"
                       value={question.question_text}
                       onChange={(e) => updateQuestion(question.id, { question_text: e.target.value })}
                       className="input-base px-5 py-3.5 text-lg font-bold tracking-tight bg-canvas-elevated/20 group-hover:bg-canvas-elevated/40"
-                      placeholder="Input the intelligence probe query…"
+                      placeholder="Enter the question for your client..."
                     />
                   </div>
 
                   <div className="flex items-center gap-10">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Probe Protocol</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Input Type</label>
                       <select
                         value={question.question_type}
                         onChange={(e) => updateQuestion(question.id, { question_type: e.target.value as Question['question_type'] })}
@@ -282,7 +281,7 @@ export default function FormEditor() {
                             }`} />
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold uppercase tracking-widest text-ink-secondary group-hover/toggle:text-ink-primary">Required Intel</span>
+                          <span className="text-xs font-bold uppercase tracking-widest text-ink-secondary group-hover/toggle:text-ink-primary">Required Question</span>
                         </div>
                       </label>
                     </div>
@@ -290,14 +289,14 @@ export default function FormEditor() {
 
                   {question.question_type === 'select' && (
                     <div className="space-y-2 animate-fade-in">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Protocol Options (Multi-choice)</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Dropdown Options</label>
                       <textarea
                         value={question.options ? JSON.parse(question.options as string).join('\n') : ''}
                         onChange={(e) => updateQuestion(question.id, {
                           options: JSON.stringify(e.target.value.split('\n').filter(o => o.trim())) as any,
                         })}
                         className="input-base resize-none py-4 px-5 text-sm font-medium leading-relaxed bg-canvas-elevated/20"
-                        placeholder="Enter the intelligence options (one entry per newline)…"
+                        placeholder="Enter options (one per line)…"
                         rows={4}
                       />
                     </div>
@@ -325,17 +324,17 @@ export default function FormEditor() {
           <div className="w-8 h-8 rounded-full bg-canvas-elevated border border-line flex items-center justify-center">
             <Plus className="w-5 h-5" />
           </div>
-          Append Intelligence Probe
+          Add New Question
         </button>
 
-        {/* Architecture Protocol Note */}
+        {/* Finalization Section */}
         <div className="flex flex-col items-center gap-4 py-12 border-t border-line/40">
           <div className="flex items-center gap-3 text-ink-tertiary opacity-40 uppercase tracking-[0.2em] font-bold text-[10px]">
             <Settings className="w-3 h-3 animate-spin duration-[6000ms]" />
-            Portal Synchronized & Verified
+            Your form is ready to share
           </div>
           <p className="text-sm text-ink-muted max-w-sm text-center italic opacity-60">
-            Ensure all portal intelligence probes are correctly configured before establishing the public tunnel.
+            Publish your form to create a public link that can be shared with your clients.
           </p>
         </div>
       </div>
