@@ -16,14 +16,12 @@ export default {
           DEFAULT: '#FFFFFF',
           secondary: '#F9FAFB',
         },
-        border: {
-          DEFAULT: '#E5E7EB',
-        },
-        text: {
-          primary: '#111827',
-          secondary: '#6B7280',
-          muted: '#9CA3AF',
-        },
+        border: '#E5E7EB',
+      },
+      textColor: {
+        primary: '#111827',
+        secondary: '#6B7280',
+        muted: '#9CA3AF',
       },
       fontFamily: {
         sans: ['Inter', 'DM Sans', 'system-ui', '-apple-system', 'sans-serif'],
