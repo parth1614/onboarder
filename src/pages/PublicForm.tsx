@@ -8,6 +8,7 @@ type Question = Database['public']['Tables']['questions']['Row'];
 
 export default function PublicForm() {
   const formId = window.location.pathname.split('/')[2];
+  const storageKey = `form_progress_${formId}`;
 
   const [form, setForm] = useState<Form | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -20,7 +21,37 @@ export default function PublicForm() {
 
   useEffect(() => {
     loadForm();
+    loadSavedProgress();
   }, [formId]);
+
+  const loadSavedProgress = () => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const { step, answers: savedAnswers } = JSON.parse(saved);
+        setCurrentStep(step || 0);
+        setAnswers(savedAnswers || {});
+      }
+    } catch (error) {
+      console.error('Error loading saved progress:', error);
+    }
+  };
+
+  const saveProgress = (step: number, currentAnswers: Record<string, string>) => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify({ step, answers: currentAnswers }));
+    } catch (error) {
+      console.error('Error saving progress:', error);
+    }
+  };
+
+  const clearProgress = () => {
+    try {
+      localStorage.removeItem(storageKey);
+    } catch (error) {
+      console.error('Error clearing progress:', error);
+    }
+  };
 
   const loadForm = async () => {
     if (!formId) return;
@@ -72,7 +103,9 @@ export default function PublicForm() {
     if (isLastQuestion) {
       handleSubmit();
     } else {
-      setCurrentStep(currentStep + 1);
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+      saveProgress(nextStep, answers);
     }
   };
 
@@ -111,6 +144,7 @@ export default function PublicForm() {
 
       if (answersError) throw answersError;
 
+      clearProgress();
       setSubmitted(true);
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -200,9 +234,11 @@ export default function PublicForm() {
               {currentQuestion.question_type === 'textarea' ? (
                 <textarea
                   value={answers[currentQuestion.id] || ''}
-                  onChange={(e) =>
-                    setAnswers({ ...answers, [currentQuestion.id]: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const newAnswers = { ...answers, [currentQuestion.id]: e.target.value };
+                    setAnswers(newAnswers);
+                    saveProgress(currentStep, newAnswers);
+                  }}
                   className="w-full px-6 py-4 text-lg rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-0 outline-none transition resize-none"
                   rows={5}
                   placeholder="Type your answer here..."
@@ -214,9 +250,11 @@ export default function PublicForm() {
                     JSON.parse(currentQuestion.options as string).map((option: string) => (
                       <button
                         key={option}
-                        onClick={() =>
-                          setAnswers({ ...answers, [currentQuestion.id]: option })
-                        }
+                        onClick={() => {
+                          const newAnswers = { ...answers, [currentQuestion.id]: option };
+                          setAnswers(newAnswers);
+                          saveProgress(currentStep, newAnswers);
+                        }}
                         className={`w-full px-6 py-4 text-lg text-left rounded-xl border-2 transition ${
                           answers[currentQuestion.id] === option
                             ? 'border-blue-500 bg-blue-50 text-blue-900'
@@ -239,9 +277,11 @@ export default function PublicForm() {
                       : 'text'
                   }
                   value={answers[currentQuestion.id] || ''}
-                  onChange={(e) =>
-                    setAnswers({ ...answers, [currentQuestion.id]: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const newAnswers = { ...answers, [currentQuestion.id]: e.target.value };
+                    setAnswers(newAnswers);
+                    saveProgress(currentStep, newAnswers);
+                  }}
                   className="w-full px-6 py-4 text-lg rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-0 outline-none transition"
                   placeholder="Type your answer here..."
                   autoFocus
