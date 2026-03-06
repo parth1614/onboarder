@@ -10,7 +10,7 @@
   }
 
   body {
-    @apply text-primary font-sans;
+    @apply text-gray-900 font-sans;
   }
 }
 
