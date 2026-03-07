@@ -129,7 +129,7 @@ export default function FormEditor() {
 
       {/* ── Navigation (80px) ── */}
       <nav className="relative z-50 border-b border-line bg-canvas/80 backdrop-blur-3xl sticky top-0" style={{ height: '80px', minHeight: '80px' }}>
-        <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 h-full flex items-center justify-between gap-8">
           <div className="flex items-center gap-6">
             <button onClick={() => navigate('/dashboard')} className="btn-ghost flex items-center gap-2 -ml-2 text-sm font-semibold hover:text-ink-primary">
               <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
@@ -144,32 +144,42 @@ export default function FormEditor() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-6 shrink-0">
             {saveMessage && (
-              <span className={`hidden sm:flex text-[10px] items-center gap-2 font-black uppercase tracking-widest ${saveMessage.includes('Saved') ? 'text-emerald-500' : 'text-danger'} animate-fade-in`}>
+              <span className={`hidden lg:flex text-[10px] items-center gap-2 font-black uppercase tracking-widest ${saveMessage.includes('Saved') ? 'text-emerald-500' : 'text-danger'} animate-fade-in`}>
                 <Check className="w-4 h-4" /> {saveMessage}
               </span>
             )}
-            <button onClick={saveForm} disabled={saving} className="btn-secondary px-4 sm:px-5 py-2 group text-xs sm:text-sm">
-              <Save className="w-4 h-4 text-ink-tertiary group-hover:text-amber-500" />
-              <span className="hidden xs:inline">{saving ? 'Syncing…' : 'Sync'}</span>
+            <button
+              onClick={saveForm}
+              disabled={saving}
+              className="px-6 py-2.5 rounded-xl bg-canvas-elevated hover:bg-canvas-secondary border border-line-strong text-ink-primary font-bold text-xs sm:text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2 shadow-xl"
+            >
+              <Save className="w-4 h-4 text-amber-500" />
+              <span>{saving ? 'Syncing…' : 'Save Changes'}</span>
             </button>
             {form.is_published ? (
-              <button onClick={copyFormLink} className="btn-primary px-4 sm:px-5 py-2 shadow-lg shadow-amber-500/20 text-xs sm:text-sm">
+              <button
+                onClick={copyFormLink}
+                className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs sm:text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg shadow-amber-500/20"
+              >
                 <ExternalLink className="w-4 h-4" />
-                <span className="hidden xs:inline">{copied ? 'Copied!' : 'Share Link'}</span>
+                <span>{copied ? 'Link Copied!' : 'Share Link'}</span>
               </button>
             ) : (
-              <button onClick={publishForm} className="btn-primary px-4 sm:px-5 py-2 shadow-lg shadow-amber-500/20 text-xs sm:text-sm">
+              <button
+                onClick={publishForm}
+                className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-black text-xs sm:text-sm transition-all hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg shadow-amber-500/20"
+              >
                 <Eye className="w-4 h-4" />
-                <span className="hidden xs:inline">Publish</span>
+                <span>Go Live & Publish</span>
               </button>
             )}
           </div>
         </div>
       </nav>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 py-16">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-16">
         {/* Editor Form Header */}
         <div className="mb-16 animate-slide-up bg-canvas-secondary/30 backdrop-blur-md rounded-3xl p-10 border border-line/40">
           <div className="flex items-center justify-between mb-8">
@@ -200,20 +210,23 @@ export default function FormEditor() {
           />
         </div>
 
-        {/* Intelligence Probes Section */}
+        {/* Form Elements Section */}
         <div className="flex items-center justify-between mb-8 px-2">
           <div className="flex items-center gap-4">
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-ink-tertiary">Form Questions</h3>
-            <div className="w-px h-4 bg-line" />
-            <span className="text-xs font-bold text-ink-muted opacity-80">{questions.length} Questions</span>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-ink-tertiary">Form Elements</h3>
+            <div className="w-px h-5 bg-line-strong" />
+            <span className="text-[11px] font-black text-amber-500/60 uppercase tracking-widest">{questions.length} Questions</span>
           </div>
-          <button onClick={addQuestion} className="btn-secondary px-4 py-2 scale-90 gap-2">
-            <Plus className="w-4 h-4" />
-            Add Question
+          <button
+            onClick={addQuestion}
+            className="px-6 py-2.5 rounded-xl bg-canvas-elevated hover:bg-canvas-secondary border border-line-strong text-ink-primary font-bold text-xs flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-lg"
+          >
+            <Plus className="w-4 h-4 text-amber-500" />
+            Add New Question
           </button>
         </div>
 
-        {/* Probes List */}
+        {/* Questions List */}
         <div className="space-y-4 mb-20">
           {questions.map((question, index) => (
             <div key={question.id} className="card-premium p-8 group animate-slide-up relative overflow-hidden" style={{ animationDelay: `${index * 0.05}s` }}>
@@ -222,28 +235,28 @@ export default function FormEditor() {
               </div>
 
               <div className="flex items-start gap-8 relative z-10">
-                {/* Visual probe indexer */}
+                {/* Visual question indexer */}
                 <div className="flex flex-col gap-2 pt-1.5 items-center shrink-0">
                   <button
                     onClick={() => moveQuestion(index, 'up')}
                     disabled={index === 0}
                     className="text-ink-tertiary hover:text-amber-500 disabled:opacity-10 transition-colors p-1"
                   >
-                    <ChevronUp className="w-5 h-5" />
+                    <ChevronUp className="w-6 h-6" />
                   </button>
-                  <div className="w-8 h-8 rounded-lg bg-canvas-elevated border border-line flex items-center justify-center text-xs font-bold font-mono text-ink-primary group-hover:border-amber-500/30">
-                    {index + 1}
+                  <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl font-black text-amber-500 group-hover:bg-amber-500 group-hover:text-black group-hover:scale-110 transition-all duration-300 shadow-xl shrink-0">
+                    {String(index + 1).padStart(2, '0')}
                   </div>
                   <button
                     onClick={() => moveQuestion(index, 'down')}
                     disabled={index === questions.length - 1}
                     className="text-ink-tertiary hover:text-amber-500 disabled:opacity-10 transition-colors p-1"
                   >
-                    <ChevronDown className="w-5 h-5" />
+                    <ChevronDown className="w-6 h-6" />
                   </button>
                 </div>
 
-                {/* Probe Configuration */}
+                {/* Question Configuration */}
                 <div className="flex-1 space-y-6">
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Question Text</label>
@@ -270,44 +283,47 @@ export default function FormEditor() {
                       </select>
                     </div>
 
-                    <div className="pt-5">
-                      <label className="flex items-center gap-4 cursor-pointer select-none group/toggle">
+                    <div className="flex items-center gap-6 pt-5">
+                      <label className="flex items-center gap-4 cursor-pointer select-none group/toggle shrink-0">
                         <div
-                          className={`relative w-12 h-7 rounded-full transition-all duration-300 border-2 ${question.is_required ? 'bg-amber-500 border-amber-400' : 'bg-canvas-elevated border-line'
-                            }`}
+                          className={`relative w-16 h-10 rounded-full transition-all duration-500 border-2 ${question.is_required ? 'bg-amber-500 border-amber-400' : 'bg-canvas-elevated border-line-strong'
+                            } shrink-0 cursor-pointer shadow-inner`}
                           onClick={() => updateQuestion(question.id, { is_required: !question.is_required })}
                         >
-                          <div className={`absolute top-1 w-4 h-4 rounded-full transition-all duration-300 shadow-xl ${question.is_required ? 'translate-x-6 bg-white' : 'translate-x-1 bg-ink-tertiary'
-                            }`} />
+                          <div className={`absolute top-1 transition-all duration-500 shadow-xl h-7 w-7 rounded-full flex items-center justify-center ${question.is_required ? 'translate-x-7 bg-black' : 'translate-x-1 bg-ink-muted'
+                            }`}>
+                            {question.is_required && <Check className="w-4 h-4 text-amber-500 shrink-0" strokeWidth={4} />}
+                          </div>
                         </div>
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold uppercase tracking-widest text-ink-secondary group-hover/toggle:text-ink-primary">Required Question</span>
+                        <div className="flex flex-col py-2">
+                          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-ink-tertiary group-hover/toggle:text-amber-500 transition-colors">Required Field</span>
+                          <span className="text-[9px] font-bold text-ink-muted leading-none mt-1 uppercase tracking-widest">{question.is_required ? 'Mandatory' : 'Optional'}</span>
                         </div>
                       </label>
                     </div>
                   </div>
 
                   {question.question_type === 'select' && (
-                    <div className="space-y-2 animate-fade-in">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-ink-muted">Dropdown Options</label>
+                    <div className="space-y-3 animate-fade-in py-4 px-6 rounded-2xl bg-canvas-elevated/40 border border-line-strong">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-amber-500/60">Dropdown Options (one per line)</label>
                       <textarea
                         value={question.options ? JSON.parse(question.options as string).join('\n') : ''}
                         onChange={(e) => updateQuestion(question.id, {
                           options: JSON.stringify(e.target.value.split('\n').filter(o => o.trim())) as any,
                         })}
-                        className="input-base resize-none py-4 px-5 text-sm font-medium leading-relaxed bg-canvas-elevated/20"
-                        placeholder="Enter options (one per line)…"
+                        className="w-full bg-transparent border-none focus:ring-0 resize-none py-2 text-base font-medium leading-relaxed placeholder:text-ink-muted/30"
+                        placeholder="Enter options here..."
                         rows={4}
                       />
                     </div>
                   )}
                 </div>
 
-                {/* Probe Termination */}
+                {/* Delete Question */}
                 <button
                   onClick={() => deleteQuestion(question.id)}
                   className="text-ink-tertiary hover:text-danger hover:bg-danger/10 p-2.5 rounded-xl transition-all shrink-0 opacity-0 group-hover:opacity-100"
-                  title="Terminate Probe"
+                  title="Delete Question"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -316,16 +332,18 @@ export default function FormEditor() {
           ))}
         </div>
 
-        {/* Append Intelligence Trigger */}
-        <button
-          onClick={addQuestion}
-          className="w-full py-8 border-2 border-dashed border-line/40 rounded-[2.5rem] bg-canvas-secondary/10 text-ink-tertiary hover:border-amber-500/20 hover:text-amber-500 hover:bg-amber-500/5 font-extrabold transition-all duration-300 flex items-center justify-center gap-4 text-lg tracking-widest uppercase mb-12"
-        >
-          <div className="w-8 h-8 rounded-full bg-canvas-elevated border border-line flex items-center justify-center">
-            <Plus className="w-5 h-5" />
-          </div>
-          Add New Question
-        </button>
+        {/* Add Question Trigger */}
+        <div className="pb-32">
+          <button
+            onClick={addQuestion}
+            className="w-full py-10 border-2 border-dashed border-line-strong rounded-[2.5rem] bg-canvas-secondary/20 text-ink-tertiary hover:border-amber-500/40 hover:text-amber-500 hover:bg-amber-500/5 font-black transition-all duration-500 flex items-center justify-center gap-6 text-xl tracking-widest uppercase group shadow-2xl"
+          >
+            <div className="w-12 h-12 rounded-full bg-canvas-elevated border border-line-strong flex items-center justify-center group-hover:bg-amber-500 group-hover:text-black transition-all duration-500 shadow-xl">
+              <Plus className="w-7 h-7" />
+            </div>
+            Add New Form Question
+          </button>
+        </div>
 
         {/* Finalization Section */}
         <div className="flex flex-col items-center gap-4 py-12 border-t border-line/40">

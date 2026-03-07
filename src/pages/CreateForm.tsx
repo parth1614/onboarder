@@ -163,7 +163,7 @@ export default function CreateForm() {
             Form Generation Hub
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-ink-primary tracking-tight mb-4 px-4">
-            {formType === 'agency' ? 'Generate from Website' : 'Context-Based Portal'}
+            {formType === 'agency' ? 'Generate from Website' : 'Create from Description'}
           </h1>
           <p className="text-base sm:text-lg text-ink-secondary font-medium leading-relaxed max-w-lg mx-auto px-4 opacity-80">
             {formType === 'agency'

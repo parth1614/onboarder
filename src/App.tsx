@@ -43,10 +43,10 @@ export default function App() {
           </div>
 
           <div className="flex flex-col items-center gap-2">
-            <h2 className="text-xl font-extrabold tracking-tighter text-ink-primary">bishopAI Workspace</h2>
+            <h2 className="text-xl font-extrabold tracking-tighter text-ink-primary">AI Onboarding Workspace</h2>
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 rounded-full border-2 border-amber-500/20 border-t-amber-500 animate-spin" />
-              <p className="text-sm font-bold uppercase tracking-widest text-ink-tertiary">Accessing Encrypted Portal…</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-ink-tertiary">Loading Your Workspace...</p>
             </div>
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function App() {
         {/* Support Footer */}
         <div className="absolute bottom-12 left-0 right-0 flex items-center justify-center gap-3 opacity-40 text-xs font-bold uppercase tracking-widest text-ink-muted">
           <RefreshCcw className="w-3 h-3 animate-spin duration-[4000ms]" />
-          Synchronizing Workspace Metadata
+          Synchronizing Workspace
         </div>
       </div>
     );

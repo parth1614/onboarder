@@ -44,13 +44,13 @@ export default function PublicForm() {
       const { data: formData, error: formError } = await supabase
         .from('forms').select('*').eq('id', formId).eq('is_published', true).maybeSingle();
       if (formError) throw formError;
-      if (!formData) { setError('Form portal not established or synchronized.'); return; }
+      if (!formData) { setError('Form could not be found or is inactive.'); return; }
       setForm(formData);
       const { data: questionsData } = await supabase
         .from('questions').select('*').eq('form_id', formId)
         .order('order_index', { ascending: true });
       setQuestions(questionsData || []);
-    } catch { setError('Protocol Handshake Failed'); }
+    } catch { setError('Failed to load the form.'); }
     finally { setLoading(false); }
   };
 
@@ -115,7 +115,7 @@ export default function PublicForm() {
         <div className="flex flex-col items-center gap-2">
           <div className="flex items-center gap-3">
             <RefreshCcw className="w-4 h-4 animate-spin text-amber-500" />
-            <p className="text-xs font-bold uppercase tracking-widest text-ink-tertiary">Establishing Portal Tunnel Protocol…</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-ink-tertiary">Loading your form...</p>
           </div>
         </div>
       </div>
@@ -129,11 +129,11 @@ export default function PublicForm() {
           <div className="w-16 h-16 rounded-2xl bg-danger-muted/30 border border-danger-border flex items-center justify-center mx-auto mb-10">
             <RefreshCcw className="w-8 h-8 text-danger" />
           </div>
-          <h2 className="text-3xl font-extrabold text-ink-primary mb-3">Protocol Identity Lost</h2>
+          <h2 className="text-3xl font-extrabold text-ink-primary mb-3">Form Not Found</h2>
           <p className="text-lg text-ink-secondary font-medium">
-            {error || 'This public portal identity could not be verified by the bishopAI protocol.'}
+            {error || 'The form you are looking for may have been removed or the link is invalid.'}
           </p>
-          <div className="mt-12 opacity-40 uppercase tracking-[0.2em] font-extrabold text-[10px] text-ink-tertiary">Tunnel Verification Error</div>
+          <div className="mt-12 opacity-40 uppercase tracking-[0.2em] font-extrabold text-[10px] text-ink-tertiary">Error 404</div>
         </div>
       </div>
     );
@@ -149,15 +149,15 @@ export default function PublicForm() {
           <div className="w-24 h-24 rounded-full bg-emerald-500/10 border-2 border-emerald-500/20 flex items-center justify-center mx-auto mb-10 shadow-xl">
             <Check className="w-12 h-12 text-emerald-500" strokeWidth={3} />
           </div>
-          <h2 className="text-4xl font-extrabold text-ink-primary mb-4 tracking-tighter uppercase line-clamp-1">Data Synchronized</h2>
+          <h2 className="text-4xl font-extrabold text-ink-primary mb-4 tracking-tighter uppercase line-clamp-1">Form Submitted</h2>
           <p className="text-xl text-ink-secondary font-light mb-12">
-            Your intelligence submission is now verified and available in the target workspace.
+            Thank you for taking the time to complete this form. Your response has been recorded.
           </p>
           <div className="flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest text-ink-muted bg-canvas-elevated/40 px-6 py-2 rounded-xl border border-line/20">
             <div className="w-4 h-4 rounded bg-amber-500 flex items-center justify-center">
               <Zap className="w-2.5 h-2.5 text-black" fill="black" />
             </div>
-            Secured via bishopAI protocol
+            Secured by AI Onboarding
           </div>
         </div>
       </div>
@@ -178,7 +178,7 @@ export default function PublicForm() {
               <span className="text-ink-secondary">{form.title}</span>
             </div>
             <span className="tabular-nums">
-              Probe #{currentStep + 1} of {questions.length}
+              Step {currentStep + 1} of {questions.length}
             </span>
           </div>
           <div className="h-1 w-full bg-line rounded-full overflow-hidden">
@@ -192,7 +192,7 @@ export default function PublicForm() {
           {currentStep === 0 && (
             <div className="mb-16 animate-slide-up text-center">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[10px] font-extrabold text-amber-500 uppercase tracking-widest mb-6">
-                Active Onboarding Identity
+                Client Onboarding
               </div>
               <h1 className="text-5xl font-extrabold text-ink-primary mb-4 tracking-tighter leading-none">{form.title}</h1>
               {form.description && (
@@ -209,8 +209,10 @@ export default function PublicForm() {
                 </div>
                 <label className="relative z-10 block">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center text-[10px] font-bold text-amber-500">IQ</div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-ink-muted">Mandatory Intelligent Submission</span>
+                    <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center text-[10px] font-bold text-amber-500">Q</div>
+                    <span className="text-xs font-bold uppercase tracking-widest text-ink-muted">
+                      {currentQuestion.is_required ? 'Required Question' : 'Optional Question'}
+                    </span>
                   </div>
                   <span className="text-3xl font-extrabold text-ink-primary leading-[1.2] tracking-tight block">
                     {currentQuestion.question_text}
@@ -226,7 +228,7 @@ export default function PublicForm() {
                     setAnswers(a); saveProgress(currentStep, a);
                   }}
                   className="input-base bg-canvas-elevated/40 text-xl font-medium px-8 py-7 resize-none min-h-[180px] leading-relaxed"
-                  placeholder="Formulate your detailed intelligence response…"
+                  placeholder="Type your response here..."
                   autoFocus
                 />
               ) : currentQuestion.question_type === 'select' ? (
@@ -265,7 +267,7 @@ export default function PublicForm() {
                     setAnswers(a); saveProgress(currentStep, a);
                   }}
                   className="input-base bg-canvas-elevated/40 text-xl font-bold px-8 py-7"
-                  placeholder="Provide target intelligence data…"
+                  placeholder="Type your answer here..."
                   autoFocus
                 />
               )}
@@ -278,12 +280,12 @@ export default function PublicForm() {
                   className="btn-ghost px-6 py-2.5 gap-2 uppercase tracking-widest font-extrabold text-[10px] disabled:opacity-0 transition-all"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  Rewind
+                  Previous
                 </button>
                 <div className="flex items-center gap-4">
                   <div className="hidden sm:flex flex-col items-end opacity-20 group">
-                    <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Commit Handshake</span>
-                    <span className="text-xs font-mono">ENTER Key / Press ↵</span>
+                    <span className="text-[10px] font-bold tracking-[0.2em] uppercase">Press Enter</span>
+                    <span className="text-xs font-mono">to continue</span>
                   </div>
                   <button
                     onClick={handleNext}
@@ -293,12 +295,12 @@ export default function PublicForm() {
                     {submitting ? (
                       <>
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        Commiting…
+                        Submitting...
                       </>
                     ) : isLastQuestion ? (
-                      <>Commit Protocol <Check className="w-6 h-6" /></>
+                      <>Submit Form <Check className="w-6 h-6" /></>
                     ) : (
-                      <>Proceed <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" /></>
+                      <>Next <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" /></>
                     )}
                   </button>
                 </div>
@@ -312,7 +314,7 @@ export default function PublicForm() {
       <div className="fixed bottom-10 left-0 right-0 z-50 pointer-events-none flex justify-center">
         <div className="px-6 py-2.5 rounded-full bg-canvas-secondary/80 backdrop-blur-xl border border-line/40 shadow-2xl flex items-center gap-3 animate-fade-in">
           <div className={`w-2 h-2 rounded-full ${Object.keys(answers).length > 0 ? 'bg-emerald-500 shadow-emerald-500/40' : 'bg-ink-muted'} animate-pulse`} />
-          <span className="text-[10px] uppercase font-black tracking-widest text-ink-tertiary">Progress Local Persistence Active</span>
+          <span className="text-[10px] uppercase font-black tracking-widest text-ink-tertiary">Progress Saved Automatically</span>
         </div>
       </div>
     </div>

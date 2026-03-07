@@ -111,7 +111,7 @@ export default function Login() {
 
           <div className="mb-12">
             <h1 className="text-4xl font-extrabold text-ink-primary tracking-tight mb-4">
-              {isSignUp ? 'Create Workspace' : 'Welcome Portal'}
+              {isSignUp ? 'Create Account' : 'Welcome Back'}
             </h1>
             <p className="text-lg text-ink-secondary font-medium">
               {isSignUp
@@ -180,7 +180,7 @@ export default function Login() {
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2">
-                  {isSignUp ? 'Create Workspace' : 'Sign in to Portal'}
+                  {isSignUp ? 'Create Account' : 'Sign In'}
                   <ArrowRight className="w-5 h-5" />
                 </span>
               )}
@@ -188,7 +188,7 @@ export default function Login() {
           </form>
 
           <p className="mt-12 text-center text-base text-ink-tertiary">
-            {isSignUp ? 'Already have a portal account? ' : "Don't have a workspace? "}
+            {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
             <button
               onClick={() => { setIsSignUp(!isSignUp); setError(''); }}
               className="text-amber-500 font-bold hover:underline transition-all"
