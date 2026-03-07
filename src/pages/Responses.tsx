@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from '../hooks/useNavigate';
 import { supabase } from '../lib/supabase';
-import { ArrowLeft, Calendar, Mail, Eye, Download, Users, Zap, ExternalLink, BarChart3, Database as DatabaseIcon, ChevronRight, Search, Activity, RefreshCcw } from 'lucide-react';
+import { ArrowLeft, Calendar, Mail, Download, Zap, BarChart3, Database as DatabaseIcon, ChevronRight, Search, Activity, RefreshCcw } from 'lucide-react';
 import type { Database } from '../lib/database.types';
 
 type Form = Database['public']['Tables']['forms']['Row'];
@@ -42,9 +42,9 @@ export default function Responses() {
         .order('submitted_at', { ascending: false });
       const rWithAnswers = await Promise.all(
         (rData || []).map(async (r) => {
-          const { data: aData } = await supabase.from('answers')
-            .select('*, question:questions(*)').eq('response_id', r.id);
-          return { ...r, answers: aData as any || [] };
+          const { data: aData } = await (supabase.from('answers') as any)
+            .select('*, question:questions(*)').eq('response_id', (r as any).id);
+          return { ...(r as any), answers: (aData as any) || [] };
         })
       );
       setResponses(rWithAnswers);

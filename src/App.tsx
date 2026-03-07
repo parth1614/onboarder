@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
-import { supabase } from './lib/supabase';
 import { useAuth } from './contexts/AuthContext';
-import { useNavigate } from './hooks/useNavigate';
-import { Zap, Sparkles, Loader2, RefreshCcw } from 'lucide-react';
+import { Zap, Sparkles, RefreshCcw } from 'lucide-react';
 import Login from './pages/Login';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';

@@ -9,3 +9,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+
+// Public-facing client that strictly acts as 'anon' role, ignoring user login state
+export const publicSupabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false,
+  },
+  global: {
+    headers: {
+      Authorization: `Bearer ${supabaseAnonKey}`,
+    },
+  },
+});

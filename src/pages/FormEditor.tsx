@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from '../hooks/useNavigate';
 import { supabase } from '../lib/supabase';
-import { ArrowLeft, Save, Eye, Plus, Trash2, Check, ExternalLink, Zap, ChevronUp, ChevronDown, Wand2, Settings, Sparkles, LayoutDashboard, Database as DatabaseIcon } from 'lucide-react';
+import { ArrowLeft, Save, Eye, Plus, Trash2, Check, ExternalLink, ChevronUp, ChevronDown, Settings, Sparkles, Database as DatabaseIcon } from 'lucide-react';
 import type { Database } from '../lib/database.types';
 
 type Form = Database['public']['Tables']['forms']['Row'];
@@ -83,14 +83,14 @@ export default function FormEditor() {
     setSaveMessage('');
     try {
       await supabase.from('questions').delete().eq('form_id', formId);
-      await (supabase.from('questions').insert(questions.map((q, i) => ({
+      await ((supabase.from('questions') as any).insert(questions.map((q, i) => ({
         form_id: formId,
         question_text: q.question_text,
         question_type: q.question_type,
         is_required: q.is_required,
         order_index: i,
         options: q.options,
-      }))) as any);
+      }))));
       setSaveMessage('Form Saved Successfully');
       setTimeout(() => setSaveMessage(''), 3000);
       await loadForm();
@@ -101,7 +101,7 @@ export default function FormEditor() {
 
   const publishForm = async () => {
     if (!form) return;
-    const { error } = await (supabase.from('forms').update({ is_published: true }).eq('id', formId) as any);
+    const { error } = await (supabase.from('forms') as any).update({ is_published: true }).eq('id', formId);
     if (!error) setForm({ ...form, is_published: true });
   };
 

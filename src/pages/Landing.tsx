@@ -1,6 +1,6 @@
 import { useNavigate } from '../hooks/useNavigate';
 import { Building2, Users, Zap, ArrowRight, BarChart3, Globe, Shield, Sparkles } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+// Removed useAuth because it is unused
 
 const features = [
   {
@@ -28,7 +28,6 @@ const steps = [
 
 export default function Landing() {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-canvas text-ink-primary">

@@ -3,9 +3,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from '../hooks/useNavigate';
 import { supabase } from '../lib/supabase';
 import {
-  Zap, Plus, FileText, BarChart3, LogOut, ExternalLink,
-  Copy, ChevronRight, LayoutDashboard, Settings,
-  Search, Filter, MoreVertical, Globe, Activity,
+  Zap, Plus, FileText, LogOut, ExternalLink,
+  Copy, Settings,
+  Search, Filter, Globe, Activity,
   Database as DatabaseIcon
 } from 'lucide-react';
 import type { Database as DBTypes } from '../lib/database.types';

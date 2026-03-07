@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { publicSupabase } from '../lib/supabase';
 import { ArrowRight, ArrowLeft, Check, Zap, Sparkles, Loader2, RefreshCcw } from 'lucide-react';
 import type { Database } from '../lib/database.types';
 
@@ -18,6 +18,7 @@ export default function PublicForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [submissionError, setSubmissionError] = useState('');
 
   useEffect(() => { loadForm(); loadSavedProgress(); }, [formId]);
 
@@ -41,12 +42,12 @@ export default function PublicForm() {
   const loadForm = async () => {
     if (!formId) return;
     try {
-      const { data: formData, error: formError } = await supabase
+      const { data: formData, error: formError } = await publicSupabase
         .from('forms').select('*').eq('id', formId).eq('is_published', true).maybeSingle();
       if (formError) throw formError;
       if (!formData) { setError('Form could not be found or is inactive.'); return; }
       setForm(formData);
-      const { data: questionsData } = await supabase
+      const { data: questionsData } = await publicSupabase
         .from('questions').select('*').eq('form_id', formId)
         .order('order_index', { ascending: true });
       setQuestions(questionsData || []);
@@ -72,22 +73,31 @@ export default function PublicForm() {
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    setSubmissionError('');
     try {
-      const { data: response, error: rErr } = await supabase.from('responses').insert({
+      const responseId = window.crypto.randomUUID();
+      const { error: rErr } = await (publicSupabase.from('responses') as any).insert({
+        id: responseId,
         form_id: formId,
         respondent_email: answers[questions.find(q => q.question_type === 'email')?.id || ''] || null,
-      }).select().single();
+      });
       if (rErr) throw rErr;
-      const { error: aErr } = await supabase.from('answers').insert(
+
+      const { error: aErr } = await (publicSupabase.from('answers') as any).insert(
         questions.filter(q => answers[q.id]).map(q => ({
-          response_id: response.id, question_id: q.id, answer_text: answers[q.id],
+          response_id: responseId, question_id: q.id, answer_text: answers[q.id],
         }))
       );
       if (aErr) throw aErr;
+
       clearProgress();
       setSubmitted(true);
-    } catch { /* Handled silently for a smoother UI experience */ }
-    finally { setSubmitting(false); }
+    } catch (err: any) {
+      console.error('Submission error:', err);
+      setSubmissionError(err.message || 'Failed to submit form. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -273,6 +283,12 @@ export default function PublicForm() {
               )}
 
               {/* Interaction Controls */}
+              {submissionError && (
+                <div className="mt-8 p-4 rounded-xl bg-danger-muted border border-danger-border text-danger text-sm font-medium">
+                  {submissionError}
+                </div>
+              )}
+
               <div className="flex items-center justify-between mt-12 pt-10 border-t border-line/40">
                 <button
                   onClick={handlePrevious}
