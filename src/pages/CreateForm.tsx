@@ -21,6 +21,68 @@ export default function CreateForm() {
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState('');
+  const [inputMode, setInputMode] = useState<'manual' | 'url'>('manual');
+  const [fetchedDescription, setFetchedDescription] = useState('');
+  const [showDescriptionEditor, setShowDescriptionEditor] = useState(false);
+  const [fetchingWebsite, setFetchingWebsite] = useState(false);
+
+  const fetchWebsiteDescription = async () => {
+    if (!websiteUrl) return;
+    setError('');
+    setFetchingWebsite(true);
+
+    try {
+      const proxyResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-website`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: websiteUrl }),
+      });
+
+      if (proxyResponse.ok) {
+        const { html } = await proxyResponse.json();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.querySelectorAll('script, style').forEach(s => s.remove());
+        const cleanText = (doc.body.textContent || '').replace(/\s+/g, ' ').trim().substring(0, 3000);
+
+        const researchResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': window.location.origin,
+          },
+          body: JSON.stringify({
+            model: 'openai/gpt-4o-mini',
+            messages: [{
+              role: 'user',
+              content: `Analyze this business website and create a detailed business description suitable for generating customer intake forms. Include: industry, services offered, target customers, and key information needed for onboarding.\n\nWebsite: ${websiteUrl}\nContent: ${cleanText}`
+            }],
+            temperature: 0.5,
+          }),
+        });
+
+        if (researchResponse.ok) {
+          const data = await researchResponse.json();
+          const description = data.choices[0].message.content;
+          setFetchedDescription(description);
+          setBusinessContext(description);
+          setShowDescriptionEditor(true);
+        } else {
+          throw new Error('Failed to analyze website');
+        }
+      } else {
+        throw new Error('Failed to fetch website');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch website. Please try again.');
+    } finally {
+      setFetchingWebsite(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +98,7 @@ export default function CreateForm() {
       let questions: any[] = [];
 
       setLoadingStep(0);
-      if (formType === 'agency' && websiteUrl) {
+      if ((formType === 'agency' && websiteUrl) || (formType === 'customer' && inputMode === 'url' && websiteUrl)) {
         try {
           const proxyResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-website`, {
             method: 'POST',
@@ -72,7 +134,7 @@ export default function CreateForm() {
           }
         } catch (e) { console.error(e); }
         if (!businessInfo) businessInfo = `Business website: ${websiteUrl}`;
-      } else if (formType === 'customer' && businessContext) {
+      } else if ((formType === 'customer' && inputMode === 'manual' && businessContext)) {
         businessInfo = businessContext;
       }
 
@@ -163,12 +225,12 @@ export default function CreateForm() {
             Form Generation Hub
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-ink-primary tracking-tight mb-4 px-4">
-            {formType === 'agency' ? 'Generate from Website' : 'Create from Description'}
+            {formType === 'agency' ? 'Generate from Website' : 'Create Customer Form'}
           </h1>
           <p className="text-base sm:text-lg text-ink-secondary font-medium leading-relaxed max-w-lg mx-auto px-4 opacity-80">
             {formType === 'agency'
               ? 'Our AI engine will deeply analyze your website architecture to craft the perfect intake journey.'
-              : "Tell us about your target clients and we'll engineer a high-performing onboarding flow."}
+              : "Describe your business manually or let us analyze your website to engineer a high-performing onboarding flow."}
           </p>
         </div>
 
@@ -209,29 +271,125 @@ export default function CreateForm() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
-                <label htmlFor="context" className="block text-xs font-bold tracking-[0.15em] uppercase text-ink-tertiary">
-                  Business Description
-                </label>
-                <textarea
-                  id="context"
-                  value={businessContext}
-                  onChange={(e) => setBusinessContext(e.target.value)}
-                  required
-                  rows={6}
-                  placeholder="Describe your business model, specific services, and what data you need from new clients."
-                  className="input-base px-6 py-5 text-lg font-medium leading-relaxed resize-none"
-                />
-                <p className="text-xs text-ink-muted leading-relaxed mt-2 opacity-80">
-                  Detailed descriptions help our AI engineer forms that result in 40% higher client conversion rates.
-                </p>
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 p-2 bg-canvas-elevated border border-line rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setInputMode('manual')}
+                    className={`flex-1 px-5 py-3 rounded-lg text-sm font-bold transition-all ${
+                      inputMode === 'manual'
+                        ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20'
+                        : 'text-ink-tertiary hover:text-ink-secondary'
+                    }`}
+                  >
+                    Manual Description
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInputMode('url')}
+                    className={`flex-1 px-5 py-3 rounded-lg text-sm font-bold transition-all ${
+                      inputMode === 'url'
+                        ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/20'
+                        : 'text-ink-tertiary hover:text-ink-secondary'
+                    }`}
+                  >
+                    From Website URL
+                  </button>
+                </div>
+
+                {inputMode === 'manual' ? (
+                  <div className="space-y-3">
+                    <label htmlFor="context" className="block text-xs font-bold tracking-[0.15em] uppercase text-ink-tertiary">
+                      Business Description
+                    </label>
+                    <textarea
+                      id="context"
+                      value={businessContext}
+                      onChange={(e) => setBusinessContext(e.target.value)}
+                      required
+                      rows={6}
+                      placeholder="Describe your business model, specific services, and what data you need from new clients."
+                      className="input-base px-6 py-5 text-lg font-medium leading-relaxed resize-none"
+                    />
+                    <p className="text-xs text-ink-muted leading-relaxed mt-2 opacity-80">
+                      Detailed descriptions help our AI engineer forms that result in 40% higher client conversion rates.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <label htmlFor="customer-website" className="block text-xs font-bold tracking-[0.15em] uppercase text-ink-tertiary">
+                      Your Website URL
+                    </label>
+                    <div className="flex gap-3">
+                      <div className="relative group/input flex-1">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-canvas-elevated border border-line flex items-center justify-center transition-colors group-hover/input:border-amber-500/30">
+                          <Globe className="w-4 h-4 text-ink-tertiary" />
+                        </div>
+                        <input
+                          id="customer-website"
+                          type="url"
+                          value={websiteUrl}
+                          onChange={(e) => {
+                            setWebsiteUrl(e.target.value);
+                            setShowDescriptionEditor(false);
+                            setFetchedDescription('');
+                          }}
+                          placeholder="https://yourbusiness.com"
+                          className="input-base pl-16 py-4 text-lg font-medium tracking-tight w-full"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={fetchWebsiteDescription}
+                        disabled={!websiteUrl || fetchingWebsite}
+                        className="btn-primary px-6 py-4 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {fetchingWebsite ? (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Analyzing...
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            <Sparkles className="w-5 h-5" />
+                            Fetch & Analyze
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-xs text-ink-muted leading-relaxed opacity-80">
+                      Our AI will analyze your website to understand your business and generate a description you can review.
+                    </p>
+
+                    {showDescriptionEditor && (
+                      <div className="space-y-3 mt-6 p-5 bg-canvas-elevated/50 border border-line rounded-xl animate-slide-up">
+                        <div className="flex items-center justify-between">
+                          <label htmlFor="fetched-context" className="block text-xs font-bold tracking-[0.15em] uppercase text-ink-tertiary">
+                            AI Generated Description
+                          </label>
+                          <span className="badge-amber text-[9px]">Editable</span>
+                        </div>
+                        <textarea
+                          id="fetched-context"
+                          value={businessContext}
+                          onChange={(e) => setBusinessContext(e.target.value)}
+                          rows={6}
+                          className="input-base px-6 py-5 text-base font-medium leading-relaxed resize-none"
+                        />
+                        <p className="text-xs text-ink-muted leading-relaxed opacity-80">
+                          Review and edit the AI-generated description before creating your form.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
             <button
               type="submit"
-              disabled={loading}
-              className="btn-primary w-full py-4 sm:py-5 text-lg sm:text-xl mt-6 shadow-xl shadow-amber-500/10 group/btn"
+              disabled={loading || (formType === 'customer' && inputMode === 'url' && !showDescriptionEditor)}
+              className="btn-primary w-full py-4 sm:py-5 text-lg sm:text-xl mt-6 shadow-xl shadow-amber-500/10 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-4">
