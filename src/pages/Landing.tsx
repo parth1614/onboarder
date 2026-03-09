@@ -1,6 +1,6 @@
+import { useState } from 'react';
 import { useNavigate } from '../hooks/useNavigate';
-import { Building2, Users, Zap, ArrowRight, BarChart3, Globe, Shield, Sparkles } from 'lucide-react';
-// Removed useAuth because it is unused
+import { Building2, Users, Zap, ArrowRight, BarChart3, Globe, Shield, Sparkles, X } from 'lucide-react';
 
 const features = [
   {
@@ -28,6 +28,7 @@ const steps = [
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <div className="min-h-screen bg-canvas text-ink-primary">
@@ -75,7 +76,7 @@ export default function Landing() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-5 px-6 w-full sm:w-auto">
               <button
-                onClick={() => navigate('/create?type=agency')}
+                onClick={() => setShowModal(true)}
                 className="btn-primary px-10 py-5 text-lg shadow-xl group w-full sm:w-auto"
               >
                 Create a form
@@ -207,6 +208,74 @@ export default function Landing() {
           </div>
         </footer>
       </main>
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-3xl bg-canvas-secondary border border-line rounded-2xl p-8 shadow-3xl animate-slide-up">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-lg bg-canvas-elevated border border-line flex items-center justify-center text-ink-tertiary hover:text-ink-primary transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-2">Choose form type</h2>
+              <p className="text-sm text-ink-secondary">Select the type of form you want to create</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  navigate('/create?type=agency');
+                }}
+                className="group card-premium p-6 text-left hover:border-amber-500/30 transition-all"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-canvas-elevated border border-line flex items-center justify-center shrink-0 group-hover:border-amber-500/30 group-hover:bg-amber-500/10 transition-all">
+                    <Building2 className="w-6 h-6 text-ink-secondary group-hover:text-amber-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold mb-2">Company/Agency Intake</h3>
+                    <p className="text-sm text-ink-secondary leading-relaxed mb-4">
+                      AI analyzes your website to generate tailored onboarding questions
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="badge-amber text-[9px]">AI Website Scan</span>
+                      <span className="badge-neutral text-[9px]">10-15 questions</span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  navigate('/create?type=customer');
+                }}
+                className="group card-premium p-6 text-left hover:border-amber-500/30 transition-all"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-canvas-elevated border border-line flex items-center justify-center shrink-0 group-hover:border-amber-500/30 group-hover:bg-amber-500/10 transition-all">
+                    <Users className="w-6 h-6 text-ink-secondary group-hover:text-amber-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold mb-2">Customer Onboarding</h3>
+                    <p className="text-sm text-ink-secondary leading-relaxed mb-4">
+                      Describe your business to get a reusable intake link for clients
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="badge-amber text-[9px]">Reusable Link</span>
+                      <span className="badge-neutral text-[9px]">Custom branded</span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

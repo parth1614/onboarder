@@ -6,7 +6,7 @@ import {
   Zap, Plus, FileText, LogOut, ExternalLink,
   Copy, Settings,
   Search, Filter, Globe, Activity,
-  Database as DatabaseIcon
+  Database as DatabaseIcon, Building2, Users, X
 } from 'lucide-react';
 import type { Database as DBTypes } from '../lib/database.types';
 
@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => { loadForms(); }, [user]);
 
@@ -125,7 +126,7 @@ export default function Dashboard() {
           </div>
 
           <button
-            onClick={() => navigate('/create?type=agency')}
+            onClick={() => setShowModal(true)}
             className="btn-primary gap-2 shrink-0"
           >
             <Plus className="w-4 h-4" />
@@ -195,7 +196,7 @@ export default function Dashboard() {
                 <p className="text-sm text-ink-secondary mb-8 max-w-md">
                   Create your first AI-powered form to start collecting client data.
                 </p>
-                <button onClick={() => navigate('/create?type=agency')} className="btn-primary gap-2">
+                <button onClick={() => setShowModal(true)} className="btn-primary gap-2">
                   <Zap className="w-4 h-4" /> Create First Form
                 </button>
               </div>
@@ -325,6 +326,74 @@ export default function Dashboard() {
       <footer className="py-8 text-center mt-16 border-t border-line/10">
         <p className="text-[9px] font-medium uppercase tracking-wider text-ink-muted/50">bishopAI © 2024</p>
       </footer>
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-3xl bg-canvas-secondary border border-line rounded-2xl p-8 shadow-3xl animate-slide-up">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-lg bg-canvas-elevated border border-line flex items-center justify-center text-ink-tertiary hover:text-ink-primary transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-2">Choose form type</h2>
+              <p className="text-sm text-ink-secondary">Select the type of form you want to create</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  navigate('/create?type=agency');
+                }}
+                className="group card-premium p-6 text-left hover:border-amber-500/30 transition-all"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-canvas-elevated border border-line flex items-center justify-center shrink-0 group-hover:border-amber-500/30 group-hover:bg-amber-500/10 transition-all">
+                    <Building2 className="w-6 h-6 text-ink-secondary group-hover:text-amber-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold mb-2">Company/Agency Intake</h3>
+                    <p className="text-sm text-ink-secondary leading-relaxed mb-4">
+                      AI analyzes your website to generate tailored onboarding questions
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="badge-amber text-[9px]">AI Website Scan</span>
+                      <span className="badge-neutral text-[9px]">10-15 questions</span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  navigate('/create?type=customer');
+                }}
+                className="group card-premium p-6 text-left hover:border-amber-500/30 transition-all"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-canvas-elevated border border-line flex items-center justify-center shrink-0 group-hover:border-amber-500/30 group-hover:bg-amber-500/10 transition-all">
+                    <Users className="w-6 h-6 text-ink-secondary group-hover:text-amber-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold mb-2">Customer Onboarding</h3>
+                    <p className="text-sm text-ink-secondary leading-relaxed mb-4">
+                      Describe your business to get a reusable intake link for clients
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="badge-amber text-[9px]">Reusable Link</span>
+                      <span className="badge-neutral text-[9px]">Custom branded</span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
