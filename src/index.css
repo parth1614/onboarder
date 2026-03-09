@@ -71,7 +71,7 @@
   /* Refined Card Styles */
   .card-premium {
     @apply relative overflow-hidden transition-all duration-300;
-    border-radius: 2.5rem;
+    border-radius: 1rem;
     background-color: var(--canvas-secondary);
     border: 1px solid var(--line);
   }
